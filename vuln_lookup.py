@@ -2,18 +2,34 @@ import sys
 import re
 from collections import defaultdict
 
-#preload XML
-import xml.etree.ElementTree as ET
+# preload XML
+import xml.etree.cElementTree as ET
 import re
-with open("nvdcve-Modified.xml") as f:
-    xmlstring = f.read()
+import glob
 
-xmlstring = re.sub(' xmlns="[^"]+"', '', xmlstring, count=1)
-root = ET.fromstring(xmlstring)
-#root = tree.getroot()
-#namespace ="http://nvd.nist.gov/feeds/cve/1.2"
+xmlstring = []
+root = None
+for filename in glob.glob('dbs/*.xml'):
+    with open(filename) as f:
+        db_string = f.read()# remove the annoying namespace
+        db_string = re.sub(' xmlns="[^"]+"', '', db_string, count=1)
+        #xmlstring.append(db_string)
+        data = ET.fromstring(db_string)
+        if root is None:
+            root = data
+        else:
+            root.extend(data)
+
+
+#root = ET.fromstring("\n".join(xmlstring))
+# namespace ="http://nvd.nist.gov/feeds/cve/1.2"
 
 def etree_to_dict(t):
+    """
+    Change the xml tree to an easy to use python dict
+    :param t: the xml tree
+    :return: a dict representation
+    """
     d = {t.tag: {} if t.attrib else None}
     children = list(t)
     if children:
@@ -34,7 +50,20 @@ def etree_to_dict(t):
     return d
 
 
-def get_package_dict(package_strs):
+def get_packages_swid(package_list):
+    """
+    Get the packages from a swid string
+    :param package_strs:
+    :return:
+    """
+
+def get_packages_rpm(package_list):
+    """
+    Get the packages from an rpm string
+    :param package_strs:
+    :return:
+    """
+    package_strs = package_list.split("\n")
     packages = defaultdict(set)
     errors = []
     for x in package_strs:
@@ -44,14 +73,30 @@ def get_package_dict(package_strs):
             path = path or ''
             verrel = version + '-' + release
             packages[name].add(version)
-            #print "\t".join([path, name, verrel, version, release, platform])
+            # print "\t".join([path, name, verrel, version, release, platform])
         else:
             errors.append('ERROR: Invalid name: %s\n' % x)
 
     return errors, packages
 
+def get_package_dict(package_list):
+    """
+    Get the packages from the string
+    :param package_strs:
+    :return:
+    """
+    if package_list.startswith("<?xml"):
+        return get_packages_swid(package_list)
+    else:
+        return get_packages_rpm(package_list)
+
 
 def get_vulns(packages):
+    """
+    Get the vulns from a list of packages returned by get_package_dict()
+    :param packages:
+    :return:
+    """
     result = defaultdict(list)
     for entry in root:
         for vuln_soft in entry.findall("vuln_soft"):
@@ -80,9 +125,7 @@ def hello():
     if request.method == "GET":
         return render_template("index.html", vulns={}, package_str="", vuln_free=False, errors=[])
     else:
-        print request.form["package_list"]
-        errors, packages = get_package_dict(request.form["package_list"].split("\n"))
-        print errors, packages
+        errors, packages = get_package_dict(request.form["package_list"])
         vulns = get_vulns(packages)
         return render_template("index.html", vulns=vulns, package_str=request.form["package_list"],
                                vuln_free=len(vulns) == 0, errors=errors)

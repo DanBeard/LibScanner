@@ -1,5 +1,3 @@
 *.pyc
 *.txt
-*.xml
-dbs/*.xml
 .idea

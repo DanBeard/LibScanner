@@ -113,15 +113,21 @@ def get_vulns(packages):
 
 
 #FLASK app
-from flask import Flask
+from flask import Flask, redirect
 from flask import render_template
 from flask import request
 import json
 
-app = Flask(__name__)
+application = Flask(__name__)
 
-@app.route("/", methods=['POST', 'GET'])
-def hello():
+
+@application.route("/", methods=['POST', 'GET'])
+def home_redirect():
+    return redirect("http://promenadesoftware.com/tools")
+
+
+@application.route("/tool", methods=['POST', 'GET'])
+def tool():
     if request.method == "GET":
         return render_template("index.html", vulns={}, package_str="", vuln_free=False, errors=[])
     else:
@@ -132,4 +138,4 @@ def hello():
 
 
 if __name__ == "__main__":
-    app.run()
+    application.run()

@@ -4,6 +4,7 @@ from collections import defaultdict
 
 # preload XML
 import xml.etree.cElementTree as ET
+import defusedxml.cElementTree as DET
 import re
 import glob
 
@@ -56,6 +57,25 @@ def get_packages_swid(package_list):
     :param package_strs:
     :return:
     """
+    package_xml = None
+    packages = defaultdict(set)
+    errors = []
+    for xml_doc in package_list.split("\n"):
+        try:
+            # remove the <? ?> if any
+            xml_doc = re.sub('<\?[^>]+\?>', '', xml_doc)
+            print xml_doc
+            # use DET since this is untrusted data
+            data = DET.fromstring(xml_doc)
+            name, version = data.attrib['name'], data.attrib['version']
+            version = version.split("-")[0]
+            packages[name].add(version)
+
+        except Exception as e:
+            errors.append(str(e))
+
+    print errors
+    return errors, packages
 
 def get_packages_rpm(package_list):
     """
@@ -107,8 +127,6 @@ def get_vulns(packages):
                     if len(intersection) > 0:
                         si = ' - ' + ','.join(intersection)
                         result[prod.attrib['name'] + si].append(etree_to_dict(entry)["entry"])
-                        print result[prod.attrib['name'] + si]
-                        print entry.attrib['name'] + "," + entry.attrib['severity'] + "," + prod.attrib['name'] + "," + str(intersection) + entry.find("desc/descript").text
     return result
 
 

@@ -139,12 +139,13 @@ import json
 application = Flask(__name__)
 
 
+# Redirect index to promenade for branding. It's how we pay the server hosting bills :)
+#@application.route("/", methods=['POST', 'GET'])
+#def home_redirect():
+#    return redirect("http://promenadesoftware.com/tools")
+
+
 @application.route("/", methods=['POST', 'GET'])
-def home_redirect():
-    return redirect("http://promenadesoftware.com/tools")
-
-
-@application.route("/tool", methods=['POST', 'GET'])
 def tool():
     if request.method == "GET":
         return render_template("index.html", vulns={}, package_str="", vuln_free=False, errors=[])

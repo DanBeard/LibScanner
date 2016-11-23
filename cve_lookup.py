@@ -9,7 +9,7 @@ import re
 import glob
 
 xmlstring = []
-root = None
+
 
 
 def parse_dbs(folder):
@@ -18,11 +18,10 @@ def parse_dbs(folder):
     :param folder: the folder full of *.xml files
     :return:
     """
-
-    global root
+    root = None
     for filename in glob.glob(folder+'/*.xml'):
         with open(filename) as f:
-            db_string = f.read()# remove the annoying namespace
+            db_string = f.read() # remove the annoying namespace
             db_string = re.sub(' xmlns="[^"]+"', '', db_string, count=1)
             # xmlstring.append(db_string)
             data = ET.fromstring(db_string)
@@ -30,6 +29,8 @@ def parse_dbs(folder):
                 root = data
             else:
                 root.extend(data)
+
+    return root
 
 
 #root = ET.fromstring("\n".join(xmlstring))
@@ -119,7 +120,7 @@ def get_package_dict(package_list):
         return get_packages_rpm(package_list)
 
 
-def get_vulns(packages):
+def get_vulns(packages, root):
     """
     Get the vulns from a list of packages returned by get_package_dict()
     :param packages:

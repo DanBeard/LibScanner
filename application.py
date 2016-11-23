@@ -6,7 +6,7 @@ from flask import request
 import json
 
 # *.xml in the dbs/ folder
-parse_dbs("dbs")
+root = parse_dbs("dbs")
 
 application = Flask(__name__)
 
@@ -23,7 +23,7 @@ def tool():
         return render_template("index.html", vulns={}, package_str="", vuln_free=False, errors=[])
     else:
         errors, packages = get_package_dict(request.form["package_list"])
-        vulns = get_vulns(packages)
+        vulns = get_vulns(packages, root)
         return render_template("index.html", vulns=vulns, package_str=request.form["package_list"],
                                vuln_free=len(vulns) == 0, errors=errors)
 

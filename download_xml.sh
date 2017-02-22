@@ -4,10 +4,11 @@ mkdir -p dbs
 cd dbs
 rm *.xml
 
-for i in $(seq -f "%02g" 2 17)
+year=`date +"%Y"`
+for i in $(seq -f "%04g" 2002 $year)
 do
-    wget https://nvd.nist.gov/download/nvdcve-20$i.xml.gz
-    gunzip nvdcve-20$i.xml.gz
+    wget https://nvd.nist.gov/download/nvdcve-$i.xml.gz
+    gunzip nvdcve-$i.xml.gz
 done
 
 rm *.gz

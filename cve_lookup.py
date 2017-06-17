@@ -9,7 +9,6 @@ import re
 import glob
 import os
 
-from Cython.Shadow import other_types
 
 xmlstring = []
 

@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(description="Lookup known vulnerabilities from 
                                              " Output in JUnit style XML where a CVE = failure")
 parser.add_argument("packages", help="The list of packages to run through the lookup", type=open)
 parser.add_argument("db_loc", help="The folder that holds the CVE xml database files", type=str)
-parser.add_argument("-f", "--format", help="The format of the packages", choices=["swid","rpm",'yocto'], default="yocto")
+parser.add_argument("-f", "--format", help="The format of the packages", choices=["swid","rpm",'yocto','ls'], default=None)
 parser.add_argument("-a", "--fail", help="Severity value [0-10] over which it will be a FAILURE", type=float, default=3)
 parser.add_argument("-i", "--ignore_file", help="""A File containing a new-line delimited list of specific CVE's to ignore
  (e.g.  CVE-2015-7697 ) . These CVE's will show up as skipped in the report""", type=open)
@@ -23,7 +23,7 @@ args = parser.parse_args()
 from cve_lookup import *
 root = parse_dbs(args.db_loc)
 
-errors, packages = get_package_dict(args.packages.read())
+errors, packages = get_package_dict(args.packages.read(), args.format)
 cves = get_vulns(packages, root)
 
 # get the ignore list

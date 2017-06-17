@@ -50,11 +50,13 @@
   </div>
   <div class="container">
       <h4> Instructions</h4>
-      <p> yocto - Follow the instructions in the <a href="http://www.yoctoproject.org/docs/current/ref-manual/ref-manual.html#maintaining-build-output-quality">yocto manual</a> and
-      paste the contents of installed-packages.txt below. <br/>
-          rpm - run 'rpm -qa' in the terminal and paste the ouput below <br/>
-          other - 'pip install swid_generator && swid_generator swid' in the terminal and paste the output below
-      </p>
+      <ul>
+          <li><strong>yocto</strong> - Follow the instructions in the <a href="http://www.yoctoproject.org/docs/current/ref-manual/ref-manual.html#maintaining-build-output-quality">yocto manual</a> and
+      paste the contents of installed-packages.txt below. </li>
+          <li><strong>rpm</strong> - run 'rpm -qa' in the terminal and paste the ouput below </li>
+          <li><strong>windows</strong> - open an admin cmd prompt and type wmic <br /> At the wmic console paste: <pre>/output:C:\InstallList.txt product list BRIEF /format:csv</pre> Copy and paste the contents of C:\InstallList.txt into the box below </li>
+          <li><strong>other</strong> - 'pip install swid_generator && swid_generator swid' in the terminal and paste the output below </li>
+    </ul>
   </div>
 
     <form action="/tool" method="post" style="text-align: center">

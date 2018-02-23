@@ -4,7 +4,7 @@ from __future__ import print_function
 Command Line Interface for the CVE lookup. See README for more information
 """
 import argparse
-
+import cgi
 
 # NIST url to link to CVEs
 NIST_URL = "https://web.nvd.nist.gov/view/vuln/detail?vulnId="
@@ -60,7 +60,7 @@ for package_name, info in cves.iteritems():
             sev = "failure" if float(e['@CVSS_score']) >= args.fail else "warning"
 
             try:
-                description = e['desc']['descript']['#text']
+                description = cgi.escape(e['desc']['descript']['#text'])
             except:
                 description = ""
 

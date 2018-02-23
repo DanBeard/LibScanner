@@ -1,5 +1,6 @@
 import sys
 import re
+from distutils.version import LooseVersion
 from collections import defaultdict
 
 # preload XML
@@ -177,7 +178,7 @@ def get_packages_wmic(package_list):
             name, version = columns[1].strip(), columns[5]
             # remove any version numbers from name
             # TODO: Sometimes the version number pulled from here is different from the one reported
-            # TODO: Let's include both right now, jsut in case
+            # TODO: Let's include both right now, just in case
             version_re = re.search(r'([0-9.]+)\W*$', name)
             if version_re is not None:
                 other_version = version_re.groups()[0]
@@ -236,8 +237,24 @@ def get_vulns(packages, root):
         for vuln_soft in entry.findall("vuln_soft"):
             for prod in vuln_soft.findall("prod"):
                 if prod.attrib['name'] in packages:
-                    vers = set([x.attrib['num'] for x in prod.findall("vers")])
-                    intersection = set(vers).intersection(packages[prod.attrib['name']])
+                    # if the product name is in the package list, then see if we have an effected version
+                    #vers = [(x.attrib['num'], x.attrib.get('prev', 0)) for x in prod.findall("vers")]
+                    installed_vers = packages[prod.attrib['name']] # what versions we have installed
+                    # find exact matches between the product version and the vuln
+                    #intersection = set(vers).intersection(installed_vers)
+                    intersection = set()
+                    # go through the list of versions and see if we have a match
+                    for v in prod.findall("vers"):
+                        version_number, prev = v.attrib['num'], v.attrib.get('prev', 0)
+                        # use Loose versioning. Better to have a false positive than a false negative.
+                        loose_version_number = LooseVersion(version_number)
+                        for iv in installed_vers: # foreach installed version
+                            # if we match the version exactly, or
+                            # we have a previous version installed and it includes previous versions
+                            # then add it to our intersection
+                            if iv == version_number or (prev and LooseVersion(iv) < loose_version_number):
+                                intersection.add(iv)
+
                     if len(intersection) > 0:
                         si = ' - ' + ','.join(intersection)
                         result[prod.attrib['name'] + si].append(etree_to_dict(entry)["entry"])

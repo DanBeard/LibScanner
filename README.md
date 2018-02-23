@@ -3,6 +3,7 @@ This is a simple flask app that parses RPM or SWID package lists and runs them t
 To get this working you will need to download a copy of the NVD here: https://nvd.nist.gov/download.cfm#CVE_FEED
 and put the xml files in the dbs folder.
 
+You can run download_xml.sh to do this for you automatically. 
 
 
 The command line interface is similar but outputs a JUnit style XML document for automated continuous integration.

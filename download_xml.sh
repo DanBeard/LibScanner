@@ -2,7 +2,7 @@
 
 mkdir -p dbs
 cd dbs
-rm *.xml
+rm -f *.xml
 
 year=`date +"%Y"`
 for i in $(seq -f "%04g" 2002 $year)
@@ -11,4 +11,4 @@ do
     gunzip nvdcve-$i.xml.gz
 done
 
-rm *.gz
+rm -f *.gz

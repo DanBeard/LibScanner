@@ -51,7 +51,7 @@ num_failed_cves = sum(len([e for e in x if (e['@name'] not in ignore_list and fl
 print('<?xml version="1.0" encoding="UTF-8" ?>')
 #print '<testsuites tests="{0}" failures="{0}" > '.format(num_cves)
 print('<testsuite id="CVE TEST" name="CVE TEST" tests="{0}" failures="{1}">'.format(num_cves, num_failed_cves))
-for package_name, info in cves.iteritems():
+for package_name, info in cves.items():
 
     for e in info:
         print('<testcase id="{0}" name="{0}" classname="{1}" time="0">'.format(e['@name'], package_name))
